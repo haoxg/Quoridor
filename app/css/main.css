@@ -1,0 +1,20 @@
+.gou {
+  background-color: black;
+}
+
+.block {
+  background-color: yellow;
+}
+
+.pos {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  list-style: none;
+}
+.ren {
+  width:100%;
+  height:100%;
+  border-radius: 50%;
+  background-color:red;
+}
