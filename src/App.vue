@@ -1,7 +1,5 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <a @click="tz">跳转</a>
     <router-view></router-view>
   </div>
 </template>
@@ -12,7 +10,7 @@ export default {
   name: 'app',
   methods:{
     tz: function(){
-      this.$router.push({name:'Hello'})
+      this.$router.push({name:'Game'})
     }
   }
 }

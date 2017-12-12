@@ -5,10 +5,10 @@
 				<li class="pos" :class="gezi.type" :style="{
 						left: gezi.x * 30 +'px',
 						top: gezi.y * 30 +'px',
-					}" v-for="gezi in gezis" :data-x="gezi.x" :data-y="gezi.y">        </li>
+					}" v-for="(gezi,index) in gezis" :data-x="gezi.x" :data-y="gezi.y" :key="index">        </li>
 			</ul>
 		</section>
-		<ren :name="p" v-for="p in players" v-on:move="moveRen($event)" ref="ren"></ren>
+		<ren :name="p" v-for="p in players" v-on:move="moveRen($event)" ref="ren" :key="p"></ren>
 	</div>
 </template>
 
