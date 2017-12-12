@@ -23,43 +23,44 @@
 		},
 		data: function() {
 			return{
-				players: ['p1', 'p2']
+				players: ['p1', 'p2'],
 			}
 			
 		},
-		created: function() {
-			this.createPan();
-		},
-		mounted: function() {
-			this.fangren(8,16,this.rens(0));
-			this.fangren(8,0,this.rens(1));
-		},
-		methods:{
-			createPan:function(){
-				this.gezis = [];
+		computed:{
+			gezis: function(){
+				let geziss = [];
 				for (var i=0; i< 17; i++) {
 					for (var j =0; j<17; j++) {
-						this.gezis.push({
+						geziss.push({
 							type: i%2 >0 || j%2>0 || (i+j)%2 >0 ? 'gou' : 'block',
 							x: i,
 							y: j
 						})
 					}
 				}
-			},
+				return geziss;
+			}
+		},
+		created: function() {
+			//
+		},
+		mounted: function() {
+			this.fangren(8,16,this.rens(0));
+			this.fangren(8,0,this.rens(1));
+		},
+		methods:{
 			rens: function(index) {
-				console.log(this.$refs.ren[index]);
 				return this.$refs.ren[index];
 			},
 			fangren:function(x,y,ren){
-				console.log(x,y,ren);
 				$('.pos[data-x='+x+'][data-y='+y+']').append($("#" + ren.name));
 				ren.setPos(x,y);      
 			},
 			moveRen:function(ren){
 				this.rens(1);
-				var dest = ren.move();
-				this.fangren(dest.x,dest.y,ren);
+				// var dest = ren.move();
+				this.fangren(ren.x,ren.y,ren);
 			}
 		}
 	}
