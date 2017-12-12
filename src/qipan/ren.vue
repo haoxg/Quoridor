@@ -57,10 +57,24 @@
 	.ren {
 		width:100%;
 		height:100%;
-		border-radius: 50%;
-		background-color:red;
-		position: relative;
+		width: 30px;
+		height: 30px;
+		position: absolute;
 		cursor: pointer;
+	}
+	.ren::after {
+		content: '';
+		display: inline-block;
+		width:100%;
+		height:100%;
+		background-image: url('../assets/aaa.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center center;
+		position: absolute;
+		left: 0;
+		top: -3px;
+		z-index: 2;
 	}
 	.ren > div{
 		position: absolute;
