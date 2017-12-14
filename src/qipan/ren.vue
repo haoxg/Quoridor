@@ -15,12 +15,14 @@
 				isShowArrow:false,
 				x:8,
 				y:16,
+				walls:10,
 			}
 		},
 		props:['name'],
 		methods:{
 			showArrow:function(){
 				this.isShowArrow = !this.isShowArrow;
+				console.log(this.x,this.y);
 			},
 			MoveUp:function(){
 				this.y = this.y - 2;
@@ -73,7 +75,7 @@
 		background-position: center center;
 		position: absolute;
 		left: 0;
-		top: -3px;
+		top: -5px;
 		z-index: 2;
 	}
 	.ren > div{
@@ -91,4 +93,11 @@
 	.ren .left{left: -100%;}
 	.ren .right{left: 100%;}
 	.ren .down{top: 100%;}
+
+	#p1.ren::after {
+		background-image: url('../assets/aaa.png');
+	}
+	#p2.ren::after {
+		background-image: url('../assets/bbb.png');
+	}
 </style>

@@ -39,8 +39,8 @@ export default {
         z-index: 2;
         position: absolute;
         margin-left: 35%;
-        margin-top: -11px;
-        border-bottom: 20px solid #510f0f;
+        margin-top: -8px;
+        border-bottom: 15px solid #510f0f;
         border-right: 2px solid #510f0f;
         box-shadow: 0px 16px 13px 0px rgba(0, 0, 0, 0.91);
 	}
