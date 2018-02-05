@@ -21,24 +21,29 @@
 		props:['name'],
 		methods:{
 			showArrow:function(){
-				this.isShowArrow = !this.isShowArrow;
-				console.log(this.x,this.y);
+				if(this.name == "p"+this.$store.state.turn){
+					this.isShowArrow = !this.isShowArrow;
+				};
 			},
 			MoveUp:function(){
 				this.y = this.y - 2;
 				this.$emit("move",this);
+				this.isShowArrow = !this.isShowArrow;
 			},
 			MoveLeft:function(){
 				this.x = this.x - 2;
 				this.$emit("move",this);
+				this.isShowArrow = !this.isShowArrow;
 			},
 			MoveRight:function(){
 				this.x = this.x + 2;
 				this.$emit("move",this);
+				this.isShowArrow = !this.isShowArrow;
 			},
 			MoveDown:function(){
 				this.y = this.y + 2;
 				this.$emit("move",this);
+				this.isShowArrow = !this.isShowArrow;
 			},
 			// move:function(to){
 			// 	if(to == 'up'){
@@ -94,10 +99,10 @@
 	.ren .right{left: 100%;}
 	.ren .down{top: 100%;}
 
-	#p1.ren::after {
+	#p0.ren::after {
 		background-image: url('../assets/aaa.png');
 	}
-	#p2.ren::after {
+	#p1.ren::after {
 		background-image: url('../assets/bbb.png');
 	}
 </style>

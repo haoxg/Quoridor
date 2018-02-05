@@ -9,10 +9,19 @@
 						<wall :isHorizontalWall="gezi.x%2 === 1? true:false" v-if="gezi.hasWall" ref="wall"></wall>
 					</li>
 			</ul>
-			<ren :name="p" v-for="p in players" v-on:move="moveRen($event)" ref="ren" :key="p"></ren>
-			
+			<ren :name="p.id" v-for="p in players" v-on:move="moveRen($event)" ref="ren" :key="p.id"></ren>
 		</section>
-		
+		<div class="game-info">
+			<span class="walls">
+				<i v-for="w in players[1].walls"></i>
+			</span>
+			<span v-bind:class="{active:turn==1}">{{players[1].name}}</span>
+			<span class="steps">{{round-2}}</span>
+			<span v-bind:class="{active:turn==0}">{{players[0].name}}</span>
+			<span class="walls">
+				<i v-for="w in players[0].walls"></i>
+			</span>
+		</div>
 	</div>
 </template>
 
@@ -28,14 +37,16 @@
 		},
 		data: function() {
 			return{
-				players: ['p1', 'p2'],
-				gezis:[],
+				players: [],
+				gezis: [],
+				round:0,
+				turn:0,
 			}
-			
 		},
 		computed:{
 		},
 		created: function() {
+			this.players = this.$store.state.rens;
 			let geziss = [];
 			for (var i=0; i< 17; i++) {
 				for (var j =0; j<17; j++) {
@@ -64,7 +75,11 @@
 				$("#" + ren.name).css("top",(y * 30+y * 15)/2 +'px')
 				$("li.block").css("z-index","1");
 				$("#" + ren.name).parent().css("z-index","2");
-				ren.setPos(x,y);   
+				ren.setPos(x,y);  
+				//切换回合
+				this.$store.commit('switchTurn');
+				this.round = this.$store.state.round;
+				this.turn = this.$store.state.turn;
 			},
 			moveRen:function(ren){
 				this.rens(1);
@@ -72,7 +87,10 @@
 				this.fangren(ren.x,ren.y,ren);
 			},
 			fangqiang:function(event){
-				console.log(this);
+				if(this.players[this.$store.state.turn].walls == 0 ){
+					alert("您没障碍物了");
+					return;
+				};	
 				if(event.target.getAttribute("data-type") === "gou"){
 					if(event.target.getAttribute("data-x")%2 === 0){
 						let index = event.target.getAttribute("data-index");
@@ -83,7 +101,14 @@
 							this.$set(this.gezis[index-1],"hasWall", !this.gezis[index-1].hasWall);
 						}
 					}
+					//是你用墙
+					this.$store.commit('useWall');
+					//切换回合
+					this.$store.commit('switchTurn');
+					this.round = this.$store.state.round;
+					this.turn = this.$store.state.turn;
 				}
+				
 			},
 		}
 	}
@@ -97,6 +122,7 @@
 		display: block;
 		position: relative;
 		box-shadow: 8px 8px 10px 0px rgb(0, 0, 0);
+		float: left;
 	}
 	.gou {
 		background-color: #333333;
@@ -154,5 +180,34 @@
         border-right: 2px solid #510f0f;
         box-shadow: 0px 16px 13px 0px rgba(0, 0, 0, 0.91);
 		opacity: .6;
+	}
+	.game-info{
+		float: left;
+		height: 400px;
+		/* background: #eee; */
+		width: 200px;
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+    	justify-content: center;
+	}
+	.game-info span{
+		font-size: 20px;
+		line-height: 80px;
+		color: #cccccc;
+	}
+	.game-info span.steps{
+		font-size: 30px;
+		color: rgb(0, 114, 38)
+	}
+	.game-info span.active{
+		color: red;
+	}
+	.game-info span.walls>i{
+		height: 25px;
+		width: 5px;
+		background: red;
+		display: inline-block;
+		margin: 2px;
 	}
 </style>
