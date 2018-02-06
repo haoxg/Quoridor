@@ -13,13 +13,13 @@
 		</section>
 		<div class="game-info">
 			<span class="walls">
-				<i v-for="w in players[1].walls"></i>
+				<i v-for="n in 10" :class="{active:players[1].walls>=n}"></i>
 			</span>
 			<span v-bind:class="{active:turn==1}">{{players[1].name}}</span>
 			<span class="steps">{{round-2}}</span>
 			<span v-bind:class="{active:turn==0}">{{players[0].name}}</span>
 			<span class="walls">
-				<i v-for="w in players[0].walls"></i>
+				<i v-for="n in 10" :class="{active:players[0].walls>=n}"></i>
 			</span>
 		</div>
 	</div>
@@ -42,8 +42,6 @@
 				round:0,
 				turn:0,
 			}
-		},
-		computed:{
 		},
 		created: function() {
 			this.players = this.$store.state.rens;
@@ -73,6 +71,8 @@
 				// $('.pos[data-x='+x+'][data-y='+y+']').append($("#" + ren.name));
 				$("#" + ren.name).css("left",(x * 30+x * 15)/2 +'px')
 				$("#" + ren.name).css("top",(y * 30+y * 15)/2 +'px')
+				$("#" + ren.name).css("animation",'jump .4s')
+				setTimeout(()=>{$("#" + ren.name).css("animation",'')},400)
 				$("li.block").css("z-index","1");
 				$("#" + ren.name).parent().css("z-index","2");
 				ren.setPos(x,y);  
@@ -85,12 +85,9 @@
 				this.rens(1);
 				// var dest = ren.move();
 				this.fangren(ren.x,ren.y,ren);
+				// console.log(ren);
 			},
-			fangqiang:function(event){
-				if(this.players[this.$store.state.turn].walls == 0 ){
-					alert("您没障碍物了");
-					return;
-				};	
+			fangqiang:function(event){	
 				if(event.target.getAttribute("data-type") === "gou"){
 					if(event.target.getAttribute("data-x")%2 === 0){
 						let index = event.target.getAttribute("data-index");
@@ -101,8 +98,15 @@
 							this.$set(this.gezis[index-1],"hasWall", !this.gezis[index-1].hasWall);
 						}
 					}
-					//是你用墙
-					this.$store.commit('useWall');
+					//因为墙的x,y坐标与人的x，y坐标相反，所以赋值时取反
+					let [x,y] = [Number(event.target.getAttribute("data-y")),Number(event.target.getAttribute("data-x"))];
+					//是否还有墙
+					if(this.players[this.$store.state.turn].walls == 0 ){
+						alert("您没障碍物了");
+						return;
+					};
+					//使用自己的墙-1,并记录墙的位置
+					this.$store.commit('useWall',[x,y]);
 					//切换回合
 					this.$store.commit('switchTurn');
 					this.round = this.$store.state.round;
@@ -115,6 +119,10 @@
 </script>
 
 <style>
+	#game {
+		display: flex;
+    	justify-content: center;
+	}
 	.pan{
 		width: 390px;
 		height: 390px;
@@ -206,8 +214,11 @@
 	.game-info span.walls>i{
 		height: 25px;
 		width: 5px;
-		background: red;
+		background: #ddd;
 		display: inline-block;
 		margin: 2px;
+	}
+	.game-info span.walls>i.active{
+		background: red;
 	}
 </style>
