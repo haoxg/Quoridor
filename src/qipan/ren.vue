@@ -13,8 +13,8 @@
 		data:function(){
 			return{
 				isShowArrow:false,
-				x:8,
-				y:16,
+				x:0,
+				y:0,
 				walls:10,
 				isHideUp:false,
 				isHideLeft:false,
@@ -41,7 +41,7 @@
 							}
 						}
 					}
-					console.log(obstruct);
+					//console.log(obstruct);
 					for(let i=0;i<obstruct.length;i++){
 						if(obstruct[i] == 0){//上
 							this.isHideUp = true
@@ -104,7 +104,7 @@
 			setPos: function(x,y) {
 				this.x = x;
 				this.y = y;
-				this.$store.state.rens[this.$store.state.turn].pos = [x,y];
+				//this.$store.state.rens[this.$store.state.turn].pos = [x,y];
 			}
 		}
 	}
@@ -113,7 +113,7 @@
 	@keyframes jump
 	{
 		0% {transform: scale(1,1);}
-		20% {transform: scale(3,3);}
+		/* 20% {transform: scale(3,3);} */
 		100% {transform: scale(1,1);}
 	}
 	.hidden{

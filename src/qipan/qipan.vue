@@ -9,14 +9,14 @@
 						<wall :isHorizontalWall="gezi.x%2 === 1? true:false" v-if="gezi.hasWall" ref="wall"></wall>
 					</li>
 			</ul>
-			<ren :name="p.id" v-for="p in players" v-on:move="moveRen($event)" ref="ren" :key="p.id"></ren>
+			<ren :name="p.id" v-for="(p,index) in players" v-on:move="moveRen($event)" ref="ren" :key="p.id" :style="'left:'+(p.pos[0] * 30+p.pos[0] * 15)/2 +'px;top:'+(p.pos[1] * 30+p.pos[1] * 15)/2 +'px;'"></ren>
 		</section>
 		<div class="game-info">
 			<span class="walls">
 				<i v-for="n in 10" :class="{active:players[1].walls>=n}"></i>
 			</span>
 			<span v-bind:class="{active:turn==1}">{{players[1].name}}</span>
-			<span class="steps">{{round-2}}</span>
+			<span class="steps">{{round}}</span>
 			<span v-bind:class="{active:turn==0}">{{players[0].name}}</span>
 			<span class="walls">
 				<i v-for="n in 10" :class="{active:players[0].walls>=n}"></i>
@@ -29,7 +29,7 @@
 	import $ from "jquery"
 	import Ren from "./ren"
 	import Wall from "./wall"
-
+	var ws = new WebSocket("ws://123.57.231.78:8181");
 	export default {
 		name: 'Game',
 		components: {
@@ -44,6 +44,10 @@
 			}
 		},
 		created: function() {
+			ws.onopen = function (e) {
+				console.log('Connection to server opened');
+			}
+			//
 			this.players = this.$store.state.rens;
 			let geziss = [];
 			for (var i=0; i< 17; i++) {
@@ -60,35 +64,58 @@
 			this.gezis = geziss;
 		},
 		mounted: function() {
-			this.fangren(8,16,this.rens(0));
-			this.fangren(8,0,this.rens(1));
+			this.fangren(0);
+			this.fangren(1);
+			//
+			ws.onmessage = (e) =>{
+				let data = JSON.parse(JSON.parse(e.data).message);
+				//同步人
+				// this.players = this.$store.state.rens;
+				// console.log(data.currentTurn);
+				// this.fangren(data.currentTurn);
+				this.$set(this.players[data.currentTurn],"pos",data.player.pos)
+				//同步步数
+				this.round = data.round;
+				//同步轮次
+				this.turn = data.turn;
+				//同步方格、墙
+				this.gezis = data.gezis;
+				//同步墙数量
+				this.$set(this.players[data.currentTurn],"walls",data.player.walls)
+			}
 		},
 		methods:{
 			rens: function(index) {
 				return this.$refs.ren[index];
 			},
-			fangren:function(x,y,ren){
-				// $('.pos[data-x='+x+'][data-y='+y+']').append($("#" + ren.name));
-				$("#" + ren.name).css("left",(x * 30+x * 15)/2 +'px')
-				$("#" + ren.name).css("top",(y * 30+y * 15)/2 +'px')
-				$("#" + ren.name).css("animation",'jump .4s')
-				setTimeout(()=>{$("#" + ren.name).css("animation",'')},400)
+			fangren:function(who){
+				let x = this.players[who].pos[0]
+				let y = this.players[who].pos[1]
+				let id = this.players[who].id
+				
+				// $("#" + id).css("left",(x * 30+x * 15)/2 +'px')
+				// $("#" + id).css("top",(y * 30+y * 15)/2 +'px')
+				$("#" + id).css("animation",'jump .4s')
+				setTimeout(()=>{$("#" + id).css("animation",'')},400)
 				$("li.block").css("z-index","1");
-				$("#" + ren.name).parent().css("z-index","2");
-				ren.setPos(x,y);  
-				//切换回合
-				this.$store.commit('switchTurn');
-				this.round = this.$store.state.round;
-				this.turn = this.$store.state.turn;
+				$("#" + id).parent().css("z-index","2");
+				
+				this.rens(who).setPos(x,y);
 			},
 			moveRen:function(ren){
-				this.rens(1);
-				// var dest = ren.move();
-				this.fangren(ren.x,ren.y,ren);
-				// console.log(ren);
+				
+				this.$store.commit('changePos',[ren.x,ren.y]);
+				//this.fangren(this.turn);
+				// 切换回合
+				this.switchTurn();
 			},
 			fangqiang:function(event){	
 				if(event.target.getAttribute("data-type") === "gou"){
+					//是否还有墙
+					if(this.players[this.$store.state.turn].walls == 0 ){
+						alert("您没障碍物了");
+						return;
+					};
 					if(event.target.getAttribute("data-x")%2 === 0){
 						let index = event.target.getAttribute("data-index");
 						this.$set(this.gezis[index-1],"hasWall", !this.gezis[index-1].hasWall);
@@ -100,20 +127,33 @@
 					}
 					//因为墙的x,y坐标与人的x，y坐标相反，所以赋值时取反
 					let [x,y] = [Number(event.target.getAttribute("data-y")),Number(event.target.getAttribute("data-x"))];
-					//是否还有墙
-					if(this.players[this.$store.state.turn].walls == 0 ){
-						alert("您没障碍物了");
-						return;
-					};
+					
 					//使用自己的墙-1,并记录墙的位置
 					this.$store.commit('useWall',[x,y]);
 					//切换回合
-					this.$store.commit('switchTurn');
-					this.round = this.$store.state.round;
-					this.turn = this.$store.state.turn;
+					this.switchTurn();
 				}
-				
 			},
+			switchTurn(){
+				let currentTurn = this.turn; //记录当前轮次
+				this.$store.commit('switchTurn');
+				this.round = this.$store.state.round;
+				this.turn = this.$store.state.turn;
+				this.players = this.$store.state.rens;
+				this.sendMessage(currentTurn,this.players[currentTurn],this.round,this.turn,this.gezis);
+			},
+			//发送信息
+			sendMessage(currentTurn,player,round,turn,gezis) {
+				if (ws.readyState === WebSocket.OPEN) {
+					ws.send(JSON.stringify({
+						"currentTurn":currentTurn,
+						"player":player,
+						"round":round,
+						"turn":turn,
+						"gezis":gezis
+					}));
+				}
+			}
 		}
 	}
 </script>

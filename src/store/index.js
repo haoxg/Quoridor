@@ -22,8 +22,6 @@ const store = new Vuex.Store({
                 state.turn++;
             }
             state.round++;
-            // console.log(state.round+"回合");
-            // console.log(state.turn+"的轮次");
         },
         useWall(state,pos){
             state.rens[state.turn].walls = state.rens[state.turn].walls - 1;
@@ -38,6 +36,9 @@ const store = new Vuex.Store({
                 }
             }
             console.log(state.wallPos);
+        },
+        changePos(state,pos){
+            state.rens[state.turn].pos = pos;
         }
     },
     actions: {
